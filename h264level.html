@@ -1,22 +1,40 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>Web Compatibility Telemetry Dashboards</title>
-<div class="container">
+<style type="text/css">
+  main {
+    display: flex;
+    justify-content: center;
+  }
+  ul {list-style: none;}
+  h4 {margin: 0.5em 0;}
+  body {font-family: sans-serif;  }
+  .chart {flex-grow: 1; margin: 2em;}
+  .legend {cursor: pointer;}
+</style>
+<main>
+<div class="chart">
+  <h3>H.264 level from canPlayType()</h3>
+  <h4 id="canplaytype-submissions"></h4>
+  <h4 id="canplaytype-measure"></h4>
   <canvas id="canplaytype" width="400" height="400"></canvas>
   <div id="legend1"></div>
 </div>
 
-<div class="container">
+<div class="chart">
+  <h3>H.264 level from decoded SPS</h3>
+  <h4 id="decodedsps-submissions"></h4>
+  <h4 id="decodedsps-measure"></h4>
   <canvas id="decoded" width="400" height="400"></canvas>
-  <div id="legend2"></div>
+  <div class="legend" id="legend2"></div>
 </div>
-<style type="text/css">
-  ul {list-style: none;}
-  .container {float: left;margin-left: 2em;margin-top: 2em;}
-</style>
+</main>
 <script src="http://telemetry.mozilla.org/v1/telemetry.js"></script>
 <script src="chart.js"></script>
 <script>
+
+var helpers = Chart.helpers;
+
 // some helper junk
 function getColor() {
   var i = 0;
@@ -46,13 +64,6 @@ function getLabel(prefix, index) {
   }
 }
 
-var ctx = document.getElementById("canplaytype").getContext("2d");
-var legend1 = document.getElementById("legend1");
-
-var ctx2 = document.getElementById("decoded").getContext("2d");
-var legend2 = document.getElementById("legend2");
-
-
 Telemetry.init(function() {
   var versions = Telemetry.versions();
   var nightly38 = versions.indexOf("nightly/38");
@@ -63,92 +74,97 @@ Telemetry.init(function() {
         var data = [];
         var histogram = histogramEvolution.range();
         //number of submissions
-        console.log(histogram.submissions());
 
-        console.log(histogram.measure());
+        document.getElementById('canplaytype-submissions').innerHTML = 'Total submissions: ' + histogram.submissions();
+        document.getElementById('canplaytype-measure').innerHTML = 'Histogram name: ' + histogram.measure();
 
         console.log(histogram.description());
   
+        //massage the data for Chart.js
         var data = [];
-        // Chart.js wants our data to look like so:
-        // var data = [
-        //     {
-        //         value: 300,
-        //         color:"#F7464A",
-        //         highlight: "#FF5A5E",
-        //         label: "Red"
-        //     },
-        // ]
-
         histogram.each(function(count, start, end, index) {
           if (count) {
             data.push({
               value: count,
               color: nextColor(),
               highlight: '#f7a32d',
-              label: getLabel("canPlayType() h264 level: ", index)
+              label: getLabel("Level ", index)
             });
           }
         });
 
 
-        var donut = new Chart(ctx).Doughnut(data, {
+        var donut = new Chart(document.getElementById("canplaytype").getContext("2d")).Doughnut(data, {
           animateRotate : false,
           animateScale : false,
           percentageInnerCutout: 40,
           segmentStrokeWidth : 1,
-          legendTemplate : "<h3>Alleged h264 level (from canPlayType)</h3><ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<segments.length; i++){%><li><span style=\"width:10px;height:10px;background-color:<%=segments[i].fillColor%>\">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;<%if(segments[i].label){%><%=segments[i].label%>, Total: <%=segments[i].value%><%}%></li><%}%></ul>"
+          legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<segments.length; i++){%><li><span style=\"width:10px;height:10px;background-color:<%=segments[i].fillColor%>\">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;<%if(segments[i].label){%><%=segments[i].label%>, Total: <%=segments[i].value%><%}%></li><%}%></ul>"
         });
 
-        legend1.innerHTML = donut.generateLegend();
+        var legendHolder = document.getElementById("legend1");
+        legendHolder.innerHTML = donut.generateLegend();
+
+        helpers.each(legendHolder.firstChild.childNodes, function(legendNode, index){
+          helpers.addEvent(legendNode, 'mouseover', function(){
+            var activeSegment = donut.segments[index];
+            activeSegment.save();
+            activeSegment.fillColor = activeSegment.highlightColor;
+            donut.showTooltip([activeSegment]);
+            activeSegment.restore();
+          });
+        });
+        helpers.addEvent(legendHolder.firstChild, 'mouseout', function(){
+          donut.draw();
+        });
     });
 
     Telemetry.loadEvolutionOverTime(version, 'VIDEO_DECODED_H264_SPS_LEVEL', function(histogramEvolution) {
-      // The HistogramEvolution instance holds a set of dates and
-      // histograms, we can iterate over them as follows
-
-        var data = [];
         var histogram = histogramEvolution.range();
-        //number of submissions
-        console.log(histogram.submissions());
-
-        console.log(histogram.measure());
+        
+        document.getElementById('decodedsps-submissions').innerHTML = 'Total submissions: ' + histogram.submissions();
+        document.getElementById('decodedsps-measure').innerHTML = 'Histogram name: ' + histogram.measure();
 
         console.log(histogram.description());
   
         var data = [];
-        // Chart.js wants our data to look like so:
-        // var data = [
-        //     {
-        //         value: 300,
-        //         color:"#F7464A",
-        //         highlight: "#FF5A5E",
-        //         label: "Red"
-        //     },
-        // ]
-
         histogram.each(function(count, start, end, index) {
           if (count) {
             data.push({
               value: count,
               color: nextColor(),
               highlight: '#f7a32d',
-              label: getLabel("decoded h264 level", index)
+              label: getLabel("Level", index)
             });
           }
         });
 
 
-        var donut = new Chart(ctx2).Doughnut(data, {
+        var donut = new Chart(document.getElementById("decoded").getContext("2d")).Doughnut(data, {
           animateRotate : false,
           animateScale : false,
           percentageInnerCutout: 40,
           segmentStrokeWidth : 1,
-          legendTemplate : "<h3>Actual decoded h264 level</h3><ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<segments.length; i++){%><li><span style=\"width:10px;height:10px;background-color:<%=segments[i].fillColor%>\">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;<%if(segments[i].label){%><%=segments[i].label%>, Total: <%=segments[i].value%><%}%></li><%}%></ul>"
+          legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<segments.length; i++){%><li><span style=\"width:10px;height:10px;background-color:<%=segments[i].fillColor%>\">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;<%if(segments[i].label){%><%=segments[i].label%>, Total: <%=segments[i].value%><%}%></li><%}%></ul>"
         });
 
-        legend2.innerHTML = donut.generateLegend();
+        var legendHolder = document.getElementById("legend2");
+        legendHolder.innerHTML = donut.generateLegend();
+
+        helpers.each(legendHolder.firstChild.childNodes, function(legendNode, index){
+          helpers.addEvent(legendNode, 'mouseover', function(){
+            var activeSegment = donut.segments[index];
+            activeSegment.save();
+            activeSegment.fillColor = activeSegment.highlightColor;
+            donut.showTooltip([activeSegment]);
+            activeSegment.restore();
+          });
+        });
+        helpers.addEvent(legendHolder.firstChild, 'mouseout', function(){
+          donut.draw();
+        });
     });
   });
 });
+
 </script>
