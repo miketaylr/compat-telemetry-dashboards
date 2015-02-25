@@ -44,11 +44,6 @@ Telemetry.init(function() {
     Telemetry.loadEvolutionOverTime(version, 'VIDEO_CANPLAYTYPE_H264_LEVEL', function(histogramEvolution) {
       var data = [];
       var histogram = histogramEvolution.range();
-      var submissions = histogram.submissions();
-      //stash submission in document.name because otherwise it won't be in scope
-      //for the templating Chart.js uses... could also use something like window.submissions
-      //but document.name never gets any love
-      document.name = submissions;
 
       document.getElementById('canplaytype-submissions').innerHTML = 'Total submissions: ' + submissions;
       document.getElementById('canplaytype-measure').innerHTML = 'Histogram name: ' + histogram.measure();
@@ -64,6 +59,10 @@ Telemetry.init(function() {
           });
         }
       });
+
+      document.name = data.reduce(function(prev, curr, index, array){
+        return prev.value + curr.value;
+      })
 
       var ctx = document.getElementById("canplaytype").getContext("2d");
       var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);
@@ -89,7 +88,6 @@ Telemetry.init(function() {
         var histogram = histogramEvolution.range();
         var submissions = histogram.submissions();
 
-        document.name = submissions;
         document.getElementById('decodedsps-submissions').innerHTML = 'Total submissions: ' + histogram.submissions();
         document.getElementById('decodedsps-measure').innerHTML = 'Histogram name: ' + histogram.measure();
   
@@ -104,6 +102,10 @@ Telemetry.init(function() {
             });
           }
         });
+
+        document.name = data.reduce(function(prev, curr, index, array){
+          return prev.value + curr.value;
+        })
 
         var ctx = document.getElementById("decoded").getContext("2d");
         var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);
