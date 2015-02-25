@@ -42,11 +42,11 @@ var legendTmpl = "<table class=\"<%=name.toLowerCase()%>-legend\">\
                       <%if(segments[i].label){%>\
                         <td><%=segments[i].label%></td>\
                         <td><%=segments[i].value%></td>\
-                        <td>(<%=(segments[i].value / document.name).toFixed(3) + '%'%>)</td>\
+                        <td><%=((segments[i].value / document.name) * 100).toFixed(2) + '%'%></td>\
                       <%}%>\
                     </tr>\
                     <%}%>\
-                  </table>";
+                  </table>";//((index * 10) * .1) / 10 Math.round(x / 100) * 100
 
 var tooltipTmpl = "\
   <%if (label){%>\

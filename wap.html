@@ -61,9 +61,9 @@ Telemetry.init(function() {
         }
       });
 
-      document.name = data.reduce(function(prev, curr, index, array){
-        return prev.value + curr.value;
-      })
+      document.name = data.reduce(function(prev, curr){
+        return prev + curr.value;
+      }, 0);
 
       var ctx = document.getElementById("wap-b2g").getContext("2d");
       var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);
@@ -105,9 +105,9 @@ Telemetry.init(function() {
         });
 
         //sum up some stuff and stash it in document.name.
-        document.name = data.reduce(function(prev, curr, index, array){
-          return prev.value + curr.value;
-        })
+        document.name = data.reduce(function(prev, curr) {
+          return prev + curr.value;
+        }, 0)
 
         var ctx = document.getElementById("wap-fennec").getContext("2d");
         var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);

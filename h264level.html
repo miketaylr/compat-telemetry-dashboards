@@ -44,6 +44,7 @@ Telemetry.init(function() {
     Telemetry.loadEvolutionOverTime(version, 'VIDEO_CANPLAYTYPE_H264_LEVEL', function(histogramEvolution) {
       var data = [];
       var histogram = histogramEvolution.range();
+      var submissions = histogram.submissions();
 
       document.getElementById('canplaytype-submissions').innerHTML = 'Total submissions: ' + submissions;
       document.getElementById('canplaytype-measure').innerHTML = 'Histogram name: ' + histogram.measure();
@@ -60,9 +61,9 @@ Telemetry.init(function() {
         }
       });
 
-      document.name = data.reduce(function(prev, curr, index, array){
-        return prev.value + curr.value;
-      })
+      document.name = data.reduce(function(prev, curr){
+        return prev + curr.value;
+      }, 0);
 
       var ctx = document.getElementById("canplaytype").getContext("2d");
       var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);
@@ -103,9 +104,9 @@ Telemetry.init(function() {
           }
         });
 
-        document.name = data.reduce(function(prev, curr, index, array){
-          return prev.value + curr.value;
-        })
+        document.name = data.reduce(function(prev, curr){
+          return prev + curr.value;
+        }, 0);
 
         var ctx = document.getElementById("decoded").getContext("2d");
         var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);
