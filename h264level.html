@@ -87,6 +87,9 @@ Telemetry.init(function() {
 
     Telemetry.loadEvolutionOverTime(version, 'VIDEO_DECODED_H264_SPS_LEVEL', function(histogramEvolution) {
         var histogram = histogramEvolution.range();
+        var submissions = histogram.submissions();
+
+        document.name = submissions;
         document.getElementById('decodedsps-submissions').innerHTML = 'Total submissions: ' + histogram.submissions();
         document.getElementById('decodedsps-measure').innerHTML = 'Histogram name: ' + histogram.measure();
   

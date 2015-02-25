@@ -10,45 +10,27 @@
   h4 {margin: 0.5em 0;}
   body {font-family: sans-serif;}
   table {width: 100%;}
-  dl {clear: left;}
-  dt {float: left;margin-right: 1em;}
   .chart {flex-grow: 1; margin: 2em;}
   .legend {cursor: pointer;}
   .legend li span:nth-child(2){float: right}
 </style>
 <main>
 <div class="chart">
-  <h3>H.264 profile from canPlayType()</h3>
-  <h4 id="canplaytype-submissions"></h4>
-  <h4 id="canplaytype-measure"></h4>
-  <canvas id="canplaytype" width="400" height="400"></canvas>
+  <h3>B2G WAP content-type HTTP response</h3>
+  <h4 id="wap-b2g-submissions"></h4>
+  <h4 id="wap-b2g-measure"></h4>
+  <canvas id="wap-b2g" width="400" height="400"></canvas>
   <div class="legend" id="legend1"></div>
 </div>
 
 <div class="chart">
-  <h3>H.264 profile from decoded SPS</h3>
-  <h4 id="decodedsps-submissions"></h4>
-  <h4 id="decodedsps-measure"></h4>
-  <canvas id="decoded" width="400" height="400"></canvas>
+  <h3>Fennec WAP content-type HTTP response</h3>
+  <h4 id="wap-fennec-submissions"></h4>
+  <h4 id="wap-fennec-measure"></h4>
+  <canvas id="wap-fennec" width="400" height="400"></canvas>
   <div class="legend" id="legend2"></div>
 </div>
 </main>
-<dl>
-  <dt>profile_idc 66</dt>
-    <dd>Baseline profile</dd>
-  <dt>profile_idc 77</dt>
-    <dd>Main profile</dd>
-  <dt>profile_idc 88</dt>
-    <dd>Extended profile</dd>
-  <dt>profile_idc 100</dt>
-    <dd>High profile</dd>
-  <dt>profile_idc 110</dt>
-    <dd>High 10 profile</dd>
-  <dt>profile_idc 122</dt>
-    <dd>High 4:2:2 profile</dd>
-  <dt>profile_idc 244</dt>
-    <dd>High 4:4:4 profile</dd>
-</dl>
 <script src="http://telemetry.mozilla.org/v1/telemetry.js"></script>
 <script src="chart.js"></script>
 <script src="common.js"></script>
@@ -59,17 +41,14 @@ Telemetry.init(function() {
   var version = versions[nightly38];
 
   Telemetry.measures(version, function(measures) {
-    Telemetry.loadEvolutionOverTime(version, 'VIDEO_CANPLAYTYPE_H264_PROFILE', function(histogramEvolution) {
+    Telemetry.loadEvolutionOverTime(version, 'HTTP_WAP_CONTENT_TYPE_RECEIVED', function(histogramEvolution) {
       var data = [];
-      var histogram = histogramEvolution.range();
+      var histogram = histogramEvolution.filter('saved_session').filter('B2G').range();
       var submissions = histogram.submissions();
-      //stash submission in document.name because otherwise it won't be in scope
-      //for the templating Chart.js uses... could also use something like window.submissions
-      //but document.name never gets any love
       document.name = submissions;
 
-      document.getElementById('canplaytype-submissions').innerHTML = 'Total submissions: ' + submissions;
-      document.getElementById('canplaytype-measure').innerHTML = 'Histogram name: ' + histogram.measure();
+      document.getElementById('wap-b2g-submissions').innerHTML = 'Total submissions: ' + submissions;
+      document.getElementById('wap-b2g-measure').innerHTML = 'Histogram name: ' + histogram.measure();
 
       var data = [];
       histogram.each(function(count, start, end, index) {
@@ -78,12 +57,12 @@ Telemetry.init(function() {
             value: count,
             color: nextColor(),
             highlight: '#f7a32d',
-            label: getLabel("Level ", index)
+            label: getWapLabel(index)
           });
         }
       });
 
-      var ctx = document.getElementById("canplaytype").getContext("2d");
+      var ctx = document.getElementById("wap-b2g").getContext("2d");
       var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);
 
       var legend = document.getElementById("legend1");
@@ -103,13 +82,13 @@ Telemetry.init(function() {
       });
     });
 
-    Telemetry.loadEvolutionOverTime(version, 'VIDEO_DECODED_H264_SPS_PROFILE', function(histogramEvolution) {
-        var histogram = histogramEvolution.range();
+    Telemetry.loadEvolutionOverTime(version, 'HTTP_WAP_CONTENT_TYPE_RECEIVED', function(histogramEvolution) {
+        var histogram = histogramEvolution.filter('saved_session').filter('Fennec').range();
         var submissions = histogram.submissions();
-        
+
         document.name = submissions;
-        document.getElementById('decodedsps-submissions').innerHTML = 'Total submissions: ' + histogram.submissions();
-        document.getElementById('decodedsps-measure').innerHTML = 'Histogram name: ' + histogram.measure();
+        document.getElementById('wap-fennec-submissions').innerHTML = 'Total submissions: ' + histogram.submissions();
+        document.getElementById('wap-fennec-measure').innerHTML = 'Histogram name: ' + histogram.measure();
   
         var data = [];
         histogram.each(function(count, start, end, index) {
@@ -118,12 +97,12 @@ Telemetry.init(function() {
               value: count,
               color: nextColor(),
               highlight: '#f7a32d',
-              label: getLabel("Level ", index)
+              label: getWapLabel(index)
             });
           }
         });
 
-        var ctx = document.getElementById("decoded").getContext("2d");
+        var ctx = document.getElementById("wap-fennec").getContext("2d");
         var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);
         var legend = document.getElementById("legend2");
         legend.innerHTML = donut.generateLegend();

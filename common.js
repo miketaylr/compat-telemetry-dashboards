@@ -26,6 +26,14 @@ function getLabel(prefix, index) {
   }
 }
 
+function getWapLabel(index) {
+  if (index === 0) {
+    return "non-WAP response";
+  } else if (index === 1) {
+    return "WAP response";
+  }
+}
+
 var legendTmpl = "<table class=\"<%=name.toLowerCase()%>-legend\">\
                     <% for (var i=0; i < segments.length; i++){%> \
                     <tr>\
