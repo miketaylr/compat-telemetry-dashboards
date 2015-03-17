@@ -91,7 +91,7 @@ Telemetry.init(function() {
 
         document.getElementById('decodedsps-submissions').innerHTML = 'Total submissions: ' + histogram.submissions();
         document.getElementById('decodedsps-measure').innerHTML = 'Histogram name: ' + histogram.measure();
-  
+
         var data = [];
         histogram.each(function(count, start, end, index) {
           if (count) {
