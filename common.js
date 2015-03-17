@@ -1,9 +1,9 @@
 function getColor() {
   var i = 0;
   var colors = [
-    '#1ffb81', '#1eee89', '#1ee192', '#1ed59a', 
-    '#1ec8a3', '#1ebbac', '#1eafb4', '#1ea2bd', 
-    '#1e95c6', '#1e89ce', '#1e7cd7', '#1e6fe0', 
+    '#1ffb81', '#1eee89', '#1ee192', '#1ed59a',
+    '#1ec8a3', '#1ebbac', '#1eafb4', '#1ea2bd',
+    '#1e95c6', '#1e89ce', '#1e7cd7', '#1e6fe0',
     '#1e63e8', '#1e56f1', '#1e4afa', '#2d46f7',
     '#2d46f7', '#4942f0', '#5840ec', '#663ee9',
     '#753de6', '#833be2', '#9239df', '#a037dc',
@@ -51,7 +51,7 @@ var legendTmpl = "<table class=\"<%=name.toLowerCase()%>-legend\">\
 var tooltipTmpl = "\
   <%if (label){%>\
     <%=label%>: \
-  <%}%> <%= (value / document.name).toFixed(3) + '%' %>";
+  <%}%> <%= ((value / document.name) * 100).toFixed(2) + '%' %>";
 
 var helpers = Chart.helpers;
 Chart.defaults.global.percentageInnerCutout = 50;
