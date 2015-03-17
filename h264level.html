@@ -31,7 +31,7 @@
   <div class="legend" id="legend2"></div>
 </div>
 </main>
-<script src="https://telemetry.mozilla.org/v1/telemetry.js"></script>
+<script src="http://telemetry.mozilla.org/v1/telemetry.js"></script>
 <script src="js/chart.js"></script>
 <script src="js/common.js"></script>
 <script>
@@ -61,9 +61,34 @@ Telemetry.init(function() {
         }
       });
 
-      document.name = data.reduce(function(prev, curr){
+      window.canPlayTypeTotal = data.reduce(function(prev, curr){
         return prev + curr.value;
       }, 0);
+
+      var legendTmpl = "<table class=\"<%=name.toLowerCase()%>-legend\">\
+                          <% for (var i=0; i < segments.length; i++){%> \
+                          <tr>\
+                            <td style=\"background-color:<%=segments[i].fillColor%>\">\
+                            &nbsp;&nbsp;&nbsp;&nbsp;</td>&nbsp;\
+                            <%if(segments[i].label){%>\
+                              <td><%=segments[i].label%></td>\
+                              <td><%=segments[i].value%></td>\
+                              <td><%=((segments[i].value / window.canPlayTypeTotal) * 100).toFixed(2) + '%'%></td>\
+                            <%}%>\
+                          </tr>\
+                          <%}%>\
+                        </table>";
+
+      var tooltipTmpl = "\
+        <%if (label){%>\
+          <%=label%>: \
+        <%}%> <%= ((value / window.canPlayTypeTotal) * 100).toFixed(2) + '%' %>";
+
+      var helpers = Chart.helpers;
+      Chart.defaults.global.percentageInnerCutout = 50;
+      Chart.defaults.global.segmentStrokeWidth = 1;
+      Chart.defaults.global.legendTemplate = legendTmpl;
+      Chart.defaults.global.tooltipTemplate = tooltipTmpl;
 
       var ctx = document.getElementById("canplaytype").getContext("2d");
       var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);
@@ -104,9 +129,35 @@ Telemetry.init(function() {
           }
         });
 
-        document.name = data.reduce(function(prev, curr){
+
+        window.decodedTotal = data.reduce(function(prev, curr){
           return prev + curr.value;
         }, 0);
+
+        var legendTmpl = "<table class=\"<%=name.toLowerCase()%>-legend\">\
+                            <% for (var i=0; i < segments.length; i++){%> \
+                            <tr>\
+                              <td style=\"background-color:<%=segments[i].fillColor%>\">\
+                              &nbsp;&nbsp;&nbsp;&nbsp;</td>&nbsp;\
+                              <%if(segments[i].label){%>\
+                                <td><%=segments[i].label%></td>\
+                                <td><%=segments[i].value%></td>\
+                                <td><%=((segments[i].value / window.decodedTotal) * 100).toFixed(2) + '%'%></td>\
+                              <%}%>\
+                            </tr>\
+                            <%}%>\
+                          </table>";
+
+        var tooltipTmpl = "\
+          <%if (label){%>\
+            <%=label%>: \
+          <%}%> <%= ((value / window.decodedTotal) * 100).toFixed(2) + '%' %>";
+
+        var helpers = Chart.helpers;
+        Chart.defaults.global.percentageInnerCutout = 50;
+        Chart.defaults.global.segmentStrokeWidth = 1;
+        Chart.defaults.global.legendTemplate = legendTmpl;
+        Chart.defaults.global.tooltipTemplate = tooltipTmpl;
 
         var ctx = document.getElementById("decoded").getContext("2d");
         var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);
