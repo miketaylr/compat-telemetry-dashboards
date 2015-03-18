@@ -26,6 +26,48 @@ function getLabel(prefix, index) {
   }
 }
 
+function zeroPad(number) {
+  return "00000000".slice(String(number).length) + number;
+}
+
+function getDecodedConstraintLabel(prefix, index) {
+  if (index == 0) {
+    return "No constraint flag set";
+  }
+  // 1  = (1 << 0) = level 0
+  // 2  = (1 << 1) = level 1
+  if (index == 3) {
+    return "Constraint sets 0 and 1";
+  }
+  // 4  = (1 << 2) = level 2
+  if (index == 7) {
+    return "Constraint sets 0, 1 and 2";
+  }
+  // 8  = (1 << 3) = level 3
+  if (index == 10) {
+    return "Constraint sets 1 and 3";
+  }
+  // 16 = (1 << 4) = level 4
+  // 32 = (1 << 5) = level 5
+  return prefix + index;
+
+}
+
+function getCanPlayTypeConstraintLabel(prefix, index) {
+  var levels = [0, 1, 2, 3, 4, 5];
+  if (index == 0) {
+    return "Invalid value";
+  }
+  // 128 = 10000000 = level 0
+  // 64  = 01000000 = level 1
+  // 32  = 00100000 = level 2
+  // 16  = 00010000 = level 3
+  // 8   = 00001000 = level 4
+  // 4   = 00000100 = level 5
+  var level = 8 - (index).toString(2).length;
+  return prefix + level;
+}
+
 function getWapLabel(index) {
   if (index === 0) {
     return "non-WAP response";
@@ -33,9 +75,3 @@ function getWapLabel(index) {
     return "WAP response";
   }
 }
-
-var helpers = Chart.helpers;
-Chart.defaults.global.percentageInnerCutout = 50;
-Chart.defaults.global.segmentStrokeWidth = 1;
-Chart.defaults.global.legendTemplate = legendTmpl;
-Chart.defaults.global.tooltipTemplate = tooltipTmpl;
