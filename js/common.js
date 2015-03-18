@@ -54,7 +54,6 @@ function getDecodedConstraintLabel(prefix, index) {
 }
 
 function getCanPlayTypeConstraintLabel(prefix, index) {
-  var levels = [0, 1, 2, 3, 4, 5];
   if (index == 0) {
     return "Invalid value";
   }
