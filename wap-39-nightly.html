@@ -14,6 +14,7 @@
   .legend {cursor: pointer;}
   .legend li span:nth-child(2){float: right}
 </style>
+<h1>WAP content-type responses in Firefox Mobile Nightly 39</h1>
 <main>
 <div class="chart">
   <h3>B2G WAP content-type HTTP response</h3>
@@ -43,8 +44,8 @@ Chart.defaults.global.segmentStrokeWidth = 1;
 
 Telemetry.init(function() {
   var versions = Telemetry.versions();
-  var nightly38 = versions.indexOf("nightly/38");
-  var version = versions[nightly38];
+  var nightly39 = versions.indexOf("nightly/39");
+  var version = versions[nightly39];
 
   Telemetry.measures(version, function(measures) {
     Telemetry.loadEvolutionOverTime(version, 'HTTP_WAP_CONTENT_TYPE_RECEIVED', function(histogramEvolution) {
