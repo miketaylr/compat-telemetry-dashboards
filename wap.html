@@ -35,6 +35,12 @@
 <script src="js/chart.js"></script>
 <script src="js/common.js"></script>
 <script>
+var helpers = Chart.helpers;
+Chart.defaults.global.percentageInnerCutout = 50;
+Chart.defaults.global.segmentStrokeWidth = 1;
+
+
+
 Telemetry.init(function() {
   var versions = Telemetry.versions();
   var nightly38 = versions.indexOf("nightly/38");
@@ -61,9 +67,31 @@ Telemetry.init(function() {
         }
       });
 
-      document.name = data.reduce(function(prev, curr){
+      window.b2gTotal = data.reduce(function(prev, curr){
         return prev + curr.value;
       }, 0);
+
+      var legendTmpl = "<table class=\"<%=name.toLowerCase()%>-legend\">\
+                          <% for (var i=0; i < segments.length; i++){%> \
+                          <tr>\
+                            <td style=\"background-color:<%=segments[i].fillColor%>\">\
+                            &nbsp;&nbsp;&nbsp;&nbsp;</td>&nbsp;\
+                            <%if(segments[i].label){%>\
+                              <td><%=segments[i].label%></td>\
+                              <td><%=segments[i].value%></td>\
+                              <td><%=((segments[i].value / window.b2gTotal) * 100).toFixed(6) + '%'%></td>\
+                            <%}%>\
+                          </tr>\
+                          <%}%>\
+                        </table>";//((index * 10) * .1) / 10 Math.round(x / 100) * 100
+
+      var tooltipTmpl = "\
+        <%if (label){%>\
+          <%=label%>: \
+        <%}%> <%= ((value / window.b2gTotal) * 100).toFixed(6) + '%' %>";
+
+      Chart.defaults.global.legendTemplate = legendTmpl;
+      Chart.defaults.global.tooltipTemplate = tooltipTmpl;
 
       var ctx = document.getElementById("wap-b2g").getContext("2d");
       var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);
@@ -91,7 +119,7 @@ Telemetry.init(function() {
 
         document.getElementById('wap-fennec-submissions').innerHTML = 'Total submissions: ' + histogram.submissions();
         document.getElementById('wap-fennec-measure').innerHTML = 'Histogram name: ' + histogram.measure();
-  
+
         var data = [];
         histogram.each(function(count, start, end, index) {
           if (count) {
@@ -104,10 +132,31 @@ Telemetry.init(function() {
           }
         });
 
-        //sum up some stuff and stash it in document.name.
-        document.name = data.reduce(function(prev, curr) {
+        window.fennecTotal = data.reduce(function(prev, curr) {
           return prev + curr.value;
         }, 0)
+
+        var legendTmpl = "<table class=\"<%=name.toLowerCase()%>-legend\">\
+                            <% for (var i=0; i < segments.length; i++){%> \
+                            <tr>\
+                              <td style=\"background-color:<%=segments[i].fillColor%>\">\
+                              &nbsp;&nbsp;&nbsp;&nbsp;</td>&nbsp;\
+                              <%if(segments[i].label){%>\
+                                <td><%=segments[i].label%></td>\
+                                <td><%=segments[i].value%></td>\
+                                <td><%=((segments[i].value / window.fennecTotal) * 100).toFixed(6) + '%'%></td>\
+                              <%}%>\
+                            </tr>\
+                            <%}%>\
+                          </table>";//((index * 10) * .1) / 10 Math.round(x / 100) * 100
+
+        var tooltipTmpl = "\
+          <%if (label){%>\
+            <%=label%>: \
+          <%}%> <%= ((value / window.fennecTotal) * 100).toFixed(6) + '%' %>";
+
+        Chart.defaults.global.legendTemplate = legendTmpl;
+        Chart.defaults.global.tooltipTemplate = tooltipTmpl;
 
         var ctx = document.getElementById("wap-fennec").getContext("2d");
         var donut = new Chart(ctx).Doughnut(data, Chart.defaults.global);
